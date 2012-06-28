@@ -1,3 +1,5 @@
+export LANG=C.UTF-8
+
 export MANIFEST_REPO=git://android.git.linaro.org/platform/manifest.git
 export MANIFEST_BRANCH=linaro_android_4.0.4
 export MANIFEST_FILENAME=tracking-panda.xml
