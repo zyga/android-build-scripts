@@ -34,7 +34,7 @@ toolchain downloads android : % :
 # ---
 # Rule to initialize repo for our build
 # ---
-android/.repo:
+android/.repo: | android
 	repo init -u $(MANIFEST_REPO) -b $(MANIFEST_BRANCH) -m $(MANIFEST_FILENAME)
 
 # ---
