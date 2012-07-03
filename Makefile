@@ -60,7 +60,7 @@ all: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # ---
 # Rule to build the three tarballs we need to make the SD card
 # ---
-$(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): | android/.repo android/Makefile
+$(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): | android/.repo android/Makefile | android-toolchain-eabi
 	$(MAKE) -C android systemtarball userdatatarball boottarball
 
 # ---
