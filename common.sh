@@ -7,7 +7,7 @@ export MANIFEST_FILENAME=tracking-panda.xml
 export TARGET_BUILD_VARIANT=tests
 export TARGET_PRODUCT=pandaboard
 export TARGET_SIMULATOR=false
-export TARGET_TOOLS_PREFIX=$(pwd)/android/android-toolchain-eabi/bin/arm-linux-androideabi-
+export TARGET_TOOLS_PREFIX=android-toolchain-eabi/bin/arm-linux-androideabi-
 export TARGET_NO_HARDWAREGFX=1
 export KERNEL_CONFIG=omap4plus_defconfig
 
