@@ -60,14 +60,14 @@ all: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # ---
 # Rule to build the three tarballs we need to make the SD card
 # ---
-$(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): | android/.repo
+$(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): | android/.repo android/Makefile
 	$(MAKE) -C android systemtarball userdatatarball boottarball
 
 # ---
 # Rule to synchronize repository
 # ---
 .PHONY: sync
-sync: | android/.repo
+android/Makefile sync: | android/.repo
 	cd android && repo sync
 
 # ---
