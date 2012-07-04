@@ -61,16 +61,26 @@ android-toolchain-eabi: | $(toolchain_archive)
 # ---
 # Rule to build everything needed to run flash a moment later
 # ---
+last-build-num=$(or $(strip $(shell cat .build-id 2>/dev/null)),0)
+pin-build-number=$(eval pinned-build-num:=$(shell expr $(last-build-num) + 1))
+current-build-num=$(or $(pinned-build-num),$(pin-build-number),$(pinned-build-num))
 .PHONY: all
-all: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
+all: | android/.repo android/Makefile android-toolchain-eabi build-logs
+	echo $(current-build-num) > .build-id
+	$(MAKE) -C android  \
+		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
+		$(addsuffix tarball, boot system userdata) showcommands \
+		2>&1 >build-logs/build-$(current-build-num).log
 
 # ---
 # Rule to build the three tarballs we need to make the SD card
 # ---
-$(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): %.tar.bz2 : | android/.repo android/Makefile android-toolchain-eabi
-	$(MAKE) -C android  \
-		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
-		$(notdir $*)tarball showcommands
+$(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2):
+	@echo "NOTE: To build each of the tarballs simply run 'make all'"
+	@echo "It seems that android build system is not stable"
+	@echo "(subsequent builds keep building stuff)"
+	@echo "so I made sure that 'make flash' won't build stuff for you"
+	@false
 
 # ---
 # Rule to synchronize repository
