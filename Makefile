@@ -5,8 +5,6 @@
 # NOTE: since this is a recursive build system it suffers the pitfalls of that design.
 # The trade-off is precision over convenience and speed.
 
-# Turn the toolchain path to an absolute value
-TARGET_TOOLS_PREFIX := $(shell pwd)/$(TARGET_TOOLS_PREFIX)
 
 # ---
 # Common variables
@@ -16,6 +14,8 @@ TARGET_TOOLS_PREFIX := $(shell pwd)/$(TARGET_TOOLS_PREFIX)
 # tarballs we care about
 OUT_DIR	= android/out/target/product/$(TARGET_PRODUCT)/
 
+# Toolchain location
+TARGET_TOOLS_PREFIX := $(shell pwd)/android-toolchain-eabi/bin/arm-linux-androideabi-
 
 # ---
 # Rule to remove products of rules that fail to execute successfully
