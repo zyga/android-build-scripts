@@ -68,7 +68,7 @@ all: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): %.tar.bz2 : | android/.repo android/Makefile android-toolchain-eabi
 	$(MAKE) -C android  \
 		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
-		$(notdir $*)tarball
+		$(notdir $*)tarball showcommands
 
 # ---
 # Rule to synchronize repository
