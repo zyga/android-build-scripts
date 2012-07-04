@@ -5,6 +5,9 @@
 # NOTE: since this is a recursive build system it suffers the pitfalls of that design.
 # The trade-off is precision over convenience and speed.
 
+# Include the panda specific settings
+# TODO: Add support for other builds
+include panda.mk
 
 # ---
 # Common variables
@@ -52,7 +55,6 @@ $(toolchain_archive): | downloads
 # ---
 android-toolchain-eabi: | $(toolchain_archive)
 	tar -jxf $(toolchain_archive)
-
 
 # ---
 # Rule to build everything needed to run flash a moment later
