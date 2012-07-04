@@ -92,6 +92,6 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # Rule to clean the build tree
 # ---
 .PHONY: clean
-clean: | android android/.repo
+clean: | android android/.repo android-toolchain-eabi
 	$(MAKE) -C android $@
 	cd android && repo forall -c git clean -f -x -d
