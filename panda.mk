@@ -16,5 +16,5 @@ LAVA_ANDROID_BINARIES=False
 LAVA_TEST_PLAN="busybox,0xbench,glmark2,skia,v8,mmtest,cts,monkey,monkey_long_run"
 MONKEY_RUNNER_URL_1="git://android.git.linaro.org/test/linaro/android/system.git"
 
-# List of variables to pass to android make
-pass-to-make = TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD_VARIANT TARGET_NO_HARDWAREGFX KERNEL_CONFIG
+# List of non-standard variables to pass to android make
+pass-to-make = TARGET_NO_HARDWAREGFX KERNEL_CONFIG

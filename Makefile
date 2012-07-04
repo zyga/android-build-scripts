@@ -20,7 +20,8 @@ OUT_DIR	= android/out/target/product/$(TARGET_PRODUCT)/
 export LANG=C
 # Toolchain location
 TARGET_TOOLS_PREFIX := $(shell pwd)/android-toolchain-eabi/bin/arm-linux-androideabi-
-pass-to-make += TARGET_TOOLS_PREFIX
+# List of variables that have to be passed to make
+pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD_VARIANT
 
 # ---
 # Rule to remove products of rules that fail to execute successfully
