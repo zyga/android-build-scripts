@@ -70,7 +70,7 @@ all: | android/.repo android/Makefile android-toolchain-eabi build-logs
 	$(MAKE) -C android  \
 		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
 		$(addsuffix tarball, boot system userdata) showcommands \
-		2>&1 >build-logs/build-$(current-build-num).log
+		>build-logs/build-$(current-build-num).log 2>&1
 
 # ---
 # Rule to build the three tarballs we need to make the SD card
