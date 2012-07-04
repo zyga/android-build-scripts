@@ -43,9 +43,9 @@ android/.repo: | android
 # ---
 # Rule to fetch the toolchain archive
 # ---
-toolchain_archive := downloads/$(shell basename $(ZK_TOOLCHAIN_URL))
+toolchain_archive := downloads/$(shell basename $(TOOLCHAIN_URL))
 $(toolchain_archive): | downloads 
-	wget --no-check-certificate $(ZK_TOOLCHAIN_URL) -O $@
+	wget --no-check-certificate $(TOOLCHAIN_URL) -O $@
 
 # ---
 # Rule to unpack the toolchain archive
