@@ -100,9 +100,9 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 	linaro-android-media-create \
 		--dev panda \
 		--mmc $(or $(get-mmc-from-env),$(get-mmc-from-system-label),$(get-mmc-error)) \
-		--system $(OUT_DIR)/system.tar.bz2 \
-		--boot $(OUT_DIR)/boot.tar.bz2 \
-		--userdata $(OUT_DIR)/userdata.tar.bz2 \
+		--system $(OUT_DIR)system.tar.bz2 \
+		--boot $(OUT_DIR)boot.tar.bz2 \
+		--userdata $(OUT_DIR)userdata.tar.bz2 \
 
 # ---
 # Rule to clean the build tree
