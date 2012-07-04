@@ -36,7 +36,7 @@ pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD
 # ---
 # Rule to create additional directories 
 # ---
-toolchain downloads android : % : 
+build-logs toolchain downloads android : % :
 	mkdir -p $@
 
 # ---
