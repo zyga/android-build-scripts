@@ -2,3 +2,4 @@ android
 downloads
 android-toolchain-eabi
 build-logs
+.build-id
