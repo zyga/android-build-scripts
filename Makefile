@@ -6,6 +6,9 @@
 # The trade-off is precision over convenience and speed.
 include common.sh
 
+# Turn the toolchain path to an absolute value
+TARGET_TOOLS_PREFIX := $(shell pwd)/$(TARGET_TOOLS_PREFIX)
+
 # ---
 # Common variables
 # ---
