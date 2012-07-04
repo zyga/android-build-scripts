@@ -64,7 +64,9 @@ all: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # Rule to build the three tarballs we need to make the SD card
 # ---
 $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2): %.tar.bz2 : | android/.repo android/Makefile android-toolchain-eabi
-	$(MAKE) -C android $(notdir $*)tarball
+	$(MAKE) -C android  \
+		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
+		$(notdir $*)tarball
 
 # ---
 # Rule to synchronize repository
@@ -93,5 +95,7 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # ---
 .PHONY: clean
 clean: | android android/.repo android-toolchain-eabi
-	$(MAKE) -C android $@
+	$(MAKE) -C android \
+		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
+		$@
 	cd android && repo forall -c git clean -f -x -d
