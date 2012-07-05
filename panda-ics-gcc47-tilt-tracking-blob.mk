@@ -18,3 +18,5 @@ MONKEY_RUNNER_URL_1="git://android.git.linaro.org/test/linaro/android/system.git
 
 # List of non-standard variables to pass to android make
 pass-to-make = TARGET_NO_HARDWAREGFX KERNEL_CONFIG
+# Argument for linaro-android-media-create --dev
+lmc-dev = panda
