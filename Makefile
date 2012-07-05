@@ -21,7 +21,7 @@ OUT_DIR	= $(CONFIGURATION)/out/target/product/$(TARGET_PRODUCT)/
 # Force all locale to C
 export LANG=C
 # Toolchain location
-TARGET_TOOLS_PREFIX := $(shell pwd)$(CONFIGURATION)/toolchain/android-toolchain-eabi/bin/arm-linux-androideabi-
+TARGET_TOOLS_PREFIX := $(shell pwd)/$(CONFIGURATION)/toolchain/android-toolchain-eabi/bin/arm-linux-androideabi-
 # List of variables that have to be passed to make
 pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD_VARIANT
 
