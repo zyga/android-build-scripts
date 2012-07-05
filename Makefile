@@ -5,9 +5,11 @@
 # NOTE: since this is a recursive build system it suffers the pitfalls of that design.
 # The trade-off is precision over convenience and speed.
 
-# Include the panda specific settings
-# TODO: Add support for other builds
-include panda.mk
+# Ensure we have a configuration variable
+CONFIGURATION ?= $(error You need to specify CONFIGURATION with the name of the config you want to build)
+
+# Load configuration specific data
+include $(CONFIGURATION).mk
 
 # ---
 # Common variables
@@ -15,11 +17,11 @@ include panda.mk
 #
 # Output directory where the android build system spits out
 # tarballs we care about
-OUT_DIR	= android/out/target/product/$(TARGET_PRODUCT)/
+OUT_DIR	= $(CONFIGURATION)/out/target/product/$(TARGET_PRODUCT)/
 # Force all locale to C
 export LANG=C
 # Toolchain location
-TARGET_TOOLS_PREFIX := $(shell pwd)/android-toolchain-eabi/bin/arm-linux-androideabi-
+TARGET_TOOLS_PREFIX := $(shell pwd)$(CONFIGURATION)/toolchain/android-toolchain-eabi/bin/arm-linux-androideabi-
 # List of variables that have to be passed to make
 pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD_VARIANT
 
@@ -36,14 +38,14 @@ pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD
 # ---
 # Rule to create additional directories 
 # ---
-build-logs toolchain downloads android : % :
+$(CONFIGURATION) $(CONFIGURATION)/build-logs $(CONFIGURATION)/toolchain downloads $(CONFIGURATION)/android : % :
 	mkdir -p $@
 
 # ---
 # Rule to initialize repo for our build
 # ---
-android/.repo: | android
-	cd android && repo init -u $(MANIFEST_REPO) -b $(MANIFEST_BRANCH) -m $(MANIFEST_FILENAME)
+$(CONFIGURATION)/android/.repo: | $(CONFIGURATION)/android
+	cd $(CONFIGURATION)/android && repo init -u $(MANIFEST_REPO) -b $(MANIFEST_BRANCH) -m $(MANIFEST_FILENAME)
 
 # ---
 # Rule to fetch the toolchain archive
@@ -55,22 +57,22 @@ $(toolchain_archive): | downloads
 # ---
 # Rule to unpack the toolchain archive
 # ---
-android-toolchain-eabi: | $(toolchain_archive)
-	tar -jxf $(toolchain_archive)
+$(CONFIGURATION)/toolchain/android-toolchain-eabi: | $(toolchain_archive) $(CONFIGURATION)/toolchain
+	tar -jxf $(toolchain_archive) -C $(CONFIGURATION)/toolchain/
 
 # ---
 # Rule to build everything needed to run flash a moment later
 # ---
-last-build-num=$(or $(strip $(shell cat .build-id 2>/dev/null)),0)
+last-build-num=$(or $(strip $(shell cat $(CONFIGURATION)/.build-id 2>/dev/null)),0)
 pin-build-number=$(eval pinned-build-num:=$(shell expr $(last-build-num) + 1))
 current-build-num=$(or $(pinned-build-num),$(pin-build-number),$(pinned-build-num))
 .PHONY: all
-all: | android/.repo android/Makefile android-toolchain-eabi build-logs
-	echo $(current-build-num) > .build-id
-	$(MAKE) -C android  \
+all: | $(CONFIGURATION)/android/.repo $(CONFIGURATION)/android/Makefile $(CONFIGURATION)/toolchain/android-toolchain-eabi $(CONFIGURATION)/build-logs
+	echo $(current-build-num) > $(CONFIGURATION)/.build-id
+	$(MAKE) -C $(CONFIGURATION)/android  \
 		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
 		$(addsuffix tarball, boot system userdata) showcommands \
-		>build-logs/build-$(current-build-num).log 2>&1
+		>$(CONFIGURATION)/build-logs/build-$(current-build-num).log 2>&1
 
 # ---
 # Rule to build the three tarballs we need to make the SD card
@@ -86,8 +88,8 @@ $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2):
 # Rule to synchronize repository
 # ---
 .PHONY: sync
-android/Makefile sync: | android/.repo
-	cd android && repo sync
+$(CONFIGURATION)/android/Makefile sync: | $(CONFIGURATION)/android/.repo
+	cd $(CONFIGURATION)/android && repo sync
 
 # ---
 # Rule to create a bootable card
@@ -98,7 +100,7 @@ get-mmc-error=$(error Unable to guess SD card location, either set SDCARD_TO_FLA
 .PHONY: flash
 flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 	linaro-android-media-create \
-		--dev panda \
+		--dev $(lmc-dev) \
 		--mmc $(or $(get-mmc-from-env),$(get-mmc-from-system-label),$(get-mmc-error)) \
 		--system $(OUT_DIR)system.tar.bz2 \
 		--boot $(OUT_DIR)boot.tar.bz2 \
@@ -108,8 +110,8 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # Rule to clean the build tree
 # ---
 .PHONY: clean
-clean: | android android/.repo android-toolchain-eabi
-	$(MAKE) -C android \
+clean: | $(CONFIGURATION)/android $(CONFIGURATION)/android/.repo $(CONFIGURATION)/toolchain/android-toolchain-eabi
+	$(MAKE) -C $(CONFIGURATION)/android \
 		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
 		$@
-	cd android && repo forall -c git clean -f -x -d
+	cd $(CONFIGURATION)/android && repo forall -c git clean -f -x -d

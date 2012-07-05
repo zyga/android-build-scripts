@@ -17,11 +17,11 @@ Once you are good to go run this:
 ```
 $ git clone git://github.com/zyga/android-build-scripts.git
 $ cd android-build-scripts
-$ make
+$ make CONFIGURATION=panda-ics-gcc47-tilt-tracking-blob
 ```
 
 To flash that to a bootable SD card run:
 
 ```
-$ make flash
+$ make flash CONFIGURATION=panda-ics-gcc47-tilt-tracking-blob
 ```
