@@ -70,7 +70,7 @@ current-build-num=$(or $(pinned-build-num),$(pin-build-number),$(pinned-build-nu
 all: | $(CONFIGURATION)/android/.repo $(CONFIGURATION)/android/Makefile $(CONFIGURATION)/toolchain/android-toolchain-eabi $(CONFIGURATION)/build-logs
 	echo $(current-build-num) > $(CONFIGURATION)/.build-id
 	$(MAKE) -C $(CONFIGURATION)/android  \
-		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
+		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
 		$(addsuffix tarball, boot system userdata) showcommands \
 		>$(CONFIGURATION)/build-logs/build-$(current-build-num).log 2>&1
 
@@ -112,6 +112,6 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 .PHONY: clean
 clean: | $(CONFIGURATION)/android $(CONFIGURATION)/android/.repo $(CONFIGURATION)/toolchain/android-toolchain-eabi
 	$(MAKE) -C $(CONFIGURATION)/android \
-		$(foreach var,$(pass-to-make),$(var)=$(value $(var))) \
+		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
 		$@
 	cd $(CONFIGURATION)/android && repo forall -c git clean -f -x -d
