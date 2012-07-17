@@ -15,6 +15,7 @@ LAVA_TEST_PLAN="busybox,0xbench,glmark2,skia,v8,mmtest,cts,monkey,monkey_long_ru
 SYNC_JOBS=10
 MONKEY_RUNNER_URL_1="git://android.git.linaro.org/test/linaro/android/system.git"
 MONKEY_RUNNER_URL_2="git://android.git.linaro.org/linaro/benchmarks.git"
+CTS_TIMEOUT=36000
 
 # List of non-standard variables to pass to android make
 pass-to-make =
