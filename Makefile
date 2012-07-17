@@ -55,6 +55,37 @@ $(toolchain_archive): | downloads
 	wget --no-check-certificate $(TOOLCHAIN_URL) -O $@
 
 # ---
+# Rule that instructs the user to download the overlay archive
+# ---
+overlay_base_url=http://snapshots.linaro.org/android/binaries/
+overlay_url=$(overlay_base_url)$(SOURCE_OVERLAY)
+overlay_archive=downloads/$(SOURCE_OVERLAY)
+$(overlay_archive): | downloads
+	@echo "Sadly, you need to download overlays yourself so that you can see the EULA"
+	@echo "So please open $(overlay_url)"
+	@echo "And save it as $@"
+	false
+
+# ---
+# Rule that applies the overlay tarball to the source tree
+# ---
+.PHONY: apply-overlay
+apply-overlay: $(overlay_archive) | $(CONFIGURATION)/android
+	tar -jxf $^ -C $(CONFIGURATION)/android
+
+# ---
+# Rule that removes the overlay tarball's files from the source tree
+# XXX: it would be better to process a manifest that is created
+# by the apply-overlay rule. This way we'd know that we really removed
+# what was installed (today it can change along with the overlay binary)
+# ---
+.PHONY: unapply-overlay
+unapply-overlay: $(overlay_archive) | $(CONFIGURATION)/android
+	for item in `tar jtf $^`; do \
+		test -f "$(CONFIGURATION)/android/$$item" && rm -v "$(CONFIGURATION)/android/$$item" || :; \
+	done
+
+# ---
 # Rule to unpack the toolchain archive
 # ---
 $(CONFIGURATION)/toolchain/android-toolchain-eabi: | $(toolchain_archive) $(CONFIGURATION)/toolchain
