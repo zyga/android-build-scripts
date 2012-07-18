@@ -54,12 +54,13 @@ toolchain_archive := downloads/$(shell basename $(TOOLCHAIN_URL))
 $(toolchain_archive): | downloads 
 	wget --no-check-certificate $(TOOLCHAIN_URL) -O $@
 
+ifdef SOURCE_OVERLAY
 # ---
 # Rule that instructs the user to download the overlay archive
 # ---
 overlay_base_url=http://snapshots.linaro.org/android/binaries/
-overlay_url=$(overlay_base_url)$(SOURCE_OVERLAY)
-overlay_archive=downloads/$(SOURCE_OVERLAY)
+overlay_url:=$(shell echo $(overlay_base_url)$(SOURCE_OVERLAY))
+overlay_archive:=$(shell echo downloads/$(SOURCE_OVERLAY))
 $(overlay_archive): | downloads
 	@echo "Sadly, you need to download overlays yourself so that you can see the EULA"
 	@echo "So please open $(overlay_url)"
@@ -67,23 +68,30 @@ $(overlay_archive): | downloads
 	false
 
 # ---
-# Rule that applies the overlay tarball to the source tree
+# Rule that requests the overlay to be applied to the source
 # ---
 .PHONY: apply-overlay
-apply-overlay: $(overlay_archive) | $(CONFIGURATION)/android
-	tar -jxf $^ -C $(CONFIGURATION)/android
+apply-overlay: $(CONFIGURATION)/overlay-list.txt
+
+# ---
+# Rule that applies the overlay tarball to the source tree
+# ---
+$(CONFIGURATION)/overlay-list.txt: $(overlay_archive) | $(CONFIGURATION) $(CONFIGURATION)/android
+	tar -jxvf $^ -C $(CONFIGURATION)/android > $@
 
 # ---
 # Rule that removes the overlay tarball's files from the source tree
-# XXX: it would be better to process a manifest that is created
-# by the apply-overlay rule. This way we'd know that we really removed
-# what was installed (today it can change along with the overlay binary)
 # ---
 .PHONY: unapply-overlay
-unapply-overlay: $(overlay_archive) | $(CONFIGURATION)/android
-	for item in `tar jtf $^`; do \
+unapply-overlay: | $(CONFIGURATION)/overlay-list.txt
+	for item in `cat $(CONFIGURATION)/overlay-list.txt`; do \
 		test -f "$(CONFIGURATION)/android/$$item" && rm -v "$(CONFIGURATION)/android/$$item" || :; \
 	done
+	rm -f $(CONFIGURATION)/overlay-list.txt
+
+clean: unapply-overlay
+all: $(CONFIGURATION)/overlay-list.txt
+endif
 
 # ---
 # Rule to unpack the toolchain archive
