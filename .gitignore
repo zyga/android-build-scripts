@@ -1,5 +1,9 @@
+*.img
 android
-downloads
 android-toolchain-eabi
 build-logs
-.build-id
+downloads
+panda-ics-gcc47-tilt-tracking-blob
+snowball-ics-gcc46-igloo-stable-blob
+snowball-ics-gcc47-igloo-stable-blob
+startupfiles
