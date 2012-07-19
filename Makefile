@@ -166,12 +166,21 @@ $(CONFIGURATION).img: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdat
 # Inject special dependencies for image and flash when we're dealing with snowball_emmc
 # ---
 ifeq ($(lmc-dev),snowball_emmc)
+image: startupfiles
 flash: flash-fail-emmc
 
 # AFAIK flash just does not work for snowball_emmc
 .PHONY: flash-fail-emmc
 flash-fail-emmc:
 	@echo "The flash target does not work with snowball_emmc, use 'make image' and 'make riff'"
+	false
+
+# Another binary blob the user has to EULA-click-through, meh
+startupfiles:
+	@echo "You need to download Snoball eMMC startup files yourself"
+	@echo "The link to get them is:"
+	@echo "http://www.igloocommunity.org/download/linaro/startupfiles/latest/"
+	@echo "Then unpack them here (there should be a directory called $@)"
 	false
 endif
 
