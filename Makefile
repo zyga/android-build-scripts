@@ -17,7 +17,7 @@ include $(CONFIGURATION).mk
 #
 # Output directory where the android build system spits out
 # tarballs we care about
-OUT_DIR	= $(CONFIGURATION)/out/target/product/$(TARGET_PRODUCT)/
+OUT_DIR	= $(CONFIGURATION)/android/out/target/product/$(TARGET_PRODUCT)/
 # Force all locale to C
 export LANG=C
 # Toolchain location
