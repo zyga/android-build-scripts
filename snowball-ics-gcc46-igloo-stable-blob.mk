@@ -20,4 +20,4 @@ CTS_TIMEOUT=36000
 # List of non-standard variables to pass to android make
 pass-to-make =
 # Argument for linaro-android-media-create --dev
-lmc-dev = snowball 
+lmc-dev = snowball_sd
