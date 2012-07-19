@@ -161,7 +161,18 @@ $(CONFIGURATION).img: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdat
 		--boot $(OUT_DIR)boot.tar.bz2 \
 		--userdata $(OUT_DIR)userdata.tar.bz2
 
+
+# ---
+# Inject special dependencies for image and flash when we're dealing with snowball_emmc
+# ---
 ifeq ($(lmc-dev),snowball_emmc)
+flash: flash-fail-emmc
+
+# AFAIK flash just does not work for snowball_emmc
+.PHONY: flash-fail-emmc
+flash-fail-emmc:
+	@echo "The flash target does not work with snowball_emmc, use 'make image' and 'make riff'"
+	false
 endif
 
 # ---
