@@ -161,6 +161,9 @@ $(CONFIGURATION).img: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdat
 		--boot $(OUT_DIR)boot.tar.bz2 \
 		--userdata $(OUT_DIR)userdata.tar.bz2
 
+ifeq ($(lmc-dev),snowball_emmc)
+endif
+
 # ---
 # Rule to clean the build tree
 # ---
