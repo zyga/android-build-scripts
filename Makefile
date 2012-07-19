@@ -182,6 +182,17 @@ startupfiles:
 	@echo "http://www.igloocommunity.org/download/linaro/startupfiles/latest/"
 	@echo "Then unpack them here (there should be a directory called $@)"
 	false
+
+# Phony target to copy the snowball image to a board
+.PHONY: riff
+riff: $(CONFIGURATION).img
+	@echo "Unplug all cables from your board (including power) and press [enter]"
+	@read DUMMY
+	@echo "Plug the USB cable to the OTG port (between power and audio connectors)"
+	@echo "Do that and press [enter]"
+	@read DUMMY
+	sudo riff -f $@
+	@echo "Plug back the power cable and turn on the board"
 endif
 
 # ---
