@@ -144,6 +144,22 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 		--system $(OUT_DIR)system.tar.bz2 \
 		--boot $(OUT_DIR)boot.tar.bz2 \
 		--userdata $(OUT_DIR)userdata.tar.bz2 \
+# ---
+# Rule to create a SD card image.
+#
+# The primary use case is for snowball_emmc, so that we can use riff
+# --
+.PHONY: image
+image: $(CONFIGURATION).img
+
+$(CONFIGURATION).img: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
+	linaro-android-media-create \
+		--dev $(lmc-dev) \
+		--image-file $(CONFIGURATION).img \
+		--image-size 1500M \
+		--system $(OUT_DIR)system.tar.bz2 \
+		--boot $(OUT_DIR)boot.tar.bz2 \
+		--userdata $(OUT_DIR)userdata.tar.bz2
 
 # ---
 # Rule to clean the build tree
