@@ -4,6 +4,7 @@ android-toolchain-eabi
 build-logs
 downloads
 panda-ics-gcc47-tilt-tracking-blob
+panda-ics-gcc47-tilt-tracking-no-tests-blob
 snowball-ics-gcc46-igloo-stable-blob
 snowball-ics-gcc47-igloo-stable-blob
 startupfiles
