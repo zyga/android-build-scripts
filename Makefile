@@ -9,7 +9,7 @@
 CONFIGURATION ?= $(error You need to specify CONFIGURATION with the name of the config you want to build)
 
 # Load configuration specific data
-include $(CONFIGURATION).mk
+include configs/$(CONFIGURATION).mk
 
 # ---
 # Common variables
