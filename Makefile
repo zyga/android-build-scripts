@@ -17,11 +17,11 @@ include configs/$(CONFIGURATION).mk
 #
 # Output directory where the android build system spits out
 # tarballs we care about
-OUT_DIR	= $(CONFIGURATION)/android/out/target/product/$(TARGET_PRODUCT)/
+OUT_DIR	= builds/$(CONFIGURATION)/android/out/target/product/$(TARGET_PRODUCT)/
 # Force all locale to C
 export LANG=C
 # Toolchain location
-TARGET_TOOLS_PREFIX := $(shell pwd)/$(CONFIGURATION)/toolchain/android-toolchain-eabi/bin/arm-linux-androideabi-
+TARGET_TOOLS_PREFIX := $(shell pwd)/builds/$(CONFIGURATION)/toolchain/android-toolchain-eabi/bin/arm-linux-androideabi-
 # List of variables that have to be passed to make
 pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD_VARIANT
 
@@ -38,14 +38,14 @@ pass-to-make += TARGET_TOOLS_PREFIX TARGET_PRODUCT TARGET_SIMULATOR TARGET_BUILD
 # ---
 # Rule to create additional directories 
 # ---
-$(CONFIGURATION) $(CONFIGURATION)/build-logs $(CONFIGURATION)/toolchain downloads $(CONFIGURATION)/android : % :
+builds/$(CONFIGURATION) builds/$(CONFIGURATION)/build-logs builds/$(CONFIGURATION)/toolchain downloads builds/$(CONFIGURATION)/android : % :
 	mkdir -p $@
 
 # ---
 # Rule to initialize repo for our build
 # ---
-$(CONFIGURATION)/android/.repo: | $(CONFIGURATION)/android
-	cd $(CONFIGURATION)/android && repo init -u $(MANIFEST_REPO) -b $(MANIFEST_BRANCH) -m $(MANIFEST_FILENAME)
+builds/$(CONFIGURATION)/android/.repo: | builds/$(CONFIGURATION)/android
+	cd builds/$(CONFIGURATION)/android && repo init -u $(MANIFEST_REPO) -b $(MANIFEST_BRANCH) -m $(MANIFEST_FILENAME)
 
 # ---
 # Rule to fetch the toolchain archive
@@ -71,47 +71,47 @@ $(overlay_archive): | downloads
 # Rule that requests the overlay to be applied to the source
 # ---
 .PHONY: apply-overlay
-apply-overlay: $(CONFIGURATION)/overlay-list.txt
+apply-overlay: builds/$(CONFIGURATION)/overlay-list.txt
 
 # ---
 # Rule that applies the overlay tarball to the source tree
 # ---
-$(CONFIGURATION)/overlay-list.txt: $(overlay_archive) | $(CONFIGURATION) $(CONFIGURATION)/android
-	tar -jxvf $^ -C $(CONFIGURATION)/android > $@
+builds/$(CONFIGURATION)/overlay-list.txt: $(overlay_archive) | builds/$(CONFIGURATION) builds/$(CONFIGURATION)/android
+	tar -jxvf $^ -C builds/$(CONFIGURATION)/android > $@
 
 # ---
 # Rule that removes the overlay tarball's files from the source tree
 # ---
 .PHONY: unapply-overlay
-unapply-overlay: | $(CONFIGURATION)/overlay-list.txt
-	for item in `cat $(CONFIGURATION)/overlay-list.txt`; do \
-		test -f "$(CONFIGURATION)/android/$$item" && rm -v "$(CONFIGURATION)/android/$$item" || :; \
+unapply-overlay: | builds/$(CONFIGURATION)/overlay-list.txt
+	for item in `cat builds/$(CONFIGURATION)/overlay-list.txt`; do \
+		test -f "builds/$(CONFIGURATION)/android/$$item" && rm -v "builds/$(CONFIGURATION)/android/$$item" || :; \
 	done
-	rm -f $(CONFIGURATION)/overlay-list.txt
+	rm -f builds/$(CONFIGURATION)/overlay-list.txt
 
 clean: unapply-overlay
-all: $(CONFIGURATION)/overlay-list.txt
+all: builds/$(CONFIGURATION)/overlay-list.txt
 endif
 
 # ---
 # Rule to unpack the toolchain archive
 # ---
-$(CONFIGURATION)/toolchain/android-toolchain-eabi: | $(toolchain_archive) $(CONFIGURATION)/toolchain
-	tar -jxf $(toolchain_archive) -C $(CONFIGURATION)/toolchain/
+builds/$(CONFIGURATION)/toolchain/android-toolchain-eabi: | $(toolchain_archive) builds/$(CONFIGURATION)/toolchain
+	tar -jxf $(toolchain_archive) -C builds/$(CONFIGURATION)/toolchain/
 
 # ---
 # Rule to build everything needed to run flash a moment later
 # ---
-last-build-num=$(or $(strip $(shell cat $(CONFIGURATION)/.build-id 2>/dev/null)),0)
+last-build-num=$(or $(strip $(shell cat builds/$(CONFIGURATION)/.build-id 2>/dev/null)),0)
 pin-build-number=$(eval pinned-build-num:=$(shell expr $(last-build-num) + 1))
 current-build-num=$(or $(pinned-build-num),$(pin-build-number),$(pinned-build-num))
 .PHONY: all
-all: | $(CONFIGURATION)/android/.repo $(CONFIGURATION)/android/Makefile $(CONFIGURATION)/toolchain/android-toolchain-eabi $(CONFIGURATION)/build-logs
-	echo $(current-build-num) > $(CONFIGURATION)/.build-id
-	$(MAKE) -C $(CONFIGURATION)/android  \
+all: | builds/$(CONFIGURATION)/android/.repo builds/$(CONFIGURATION)/android/Makefile builds/$(CONFIGURATION)/toolchain/android-toolchain-eabi builds/$(CONFIGURATION)/build-logs
+	echo $(current-build-num) > builds/$(CONFIGURATION)/.build-id
+	$(MAKE) -C builds/$(CONFIGURATION)/android  \
 		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
 		$(addsuffix tarball, boot system userdata) showcommands \
-		>$(CONFIGURATION)/build-logs/build-$(current-build-num).log 2>&1
+		>builds/$(CONFIGURATION)/build-logs/build-$(current-build-num).log 2>&1
 
 # ---
 # Rule to build the three tarballs we need to make the SD card
@@ -127,8 +127,8 @@ $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2):
 # Rule to synchronize repository
 # ---
 .PHONY: sync
-$(CONFIGURATION)/android/Makefile sync: | $(CONFIGURATION)/android/.repo
-	cd $(CONFIGURATION)/android && repo sync
+builds/$(CONFIGURATION)/android/Makefile sync: | builds/$(CONFIGURATION)/android/.repo
+	cd builds/$(CONFIGURATION)/android && repo sync
 
 # ---
 # Rule to create a bootable card
@@ -151,12 +151,12 @@ flash: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 # The primary use case is for snowball_emmc, so that we can use riff
 # --
 .PHONY: image
-image: $(CONFIGURATION).img
+image: builds/$(CONFIGURATION).img
 
-$(CONFIGURATION).img: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
+builds/$(CONFIGURATION).img: $(addprefix $(OUT_DIR),system.tar.bz2 boot.tar.bz2 userdata.tar.bz2)
 	linaro-android-media-create \
 		--dev $(lmc-dev) \
-		--image-file $(CONFIGURATION).img \
+		--image-file builds/$(CONFIGURATION).img \
 		--image-size 1500M \
 		--system $(OUT_DIR)system.tar.bz2 \
 		--boot $(OUT_DIR)boot.tar.bz2 \
@@ -186,7 +186,7 @@ startupfiles:
 
 # Phony target to copy the snowball image to a board
 .PHONY: riff
-riff: $(CONFIGURATION).img
+riff: builds/$(CONFIGURATION).img
 	@echo "Unplug all cables from your board (including power) and press [enter]"
 	@read DUMMY
 	@echo "Plug the USB cable to the OTG port (between power and audio connectors)"
@@ -200,8 +200,8 @@ endif
 # Rule to clean the build tree
 # ---
 .PHONY: clean
-clean: | $(CONFIGURATION)/android $(CONFIGURATION)/android/.repo $(CONFIGURATION)/toolchain/android-toolchain-eabi
-	$(MAKE) -C $(CONFIGURATION)/android \
+clean: | builds/$(CONFIGURATION)/android builds/$(CONFIGURATION)/android/.repo builds/$(CONFIGURATION)/toolchain/android-toolchain-eabi
+	$(MAKE) -C builds/$(CONFIGURATION)/android \
 		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
 		$@
-	cd $(CONFIGURATION)/android && repo forall -c git clean -f -x -d
+	cd builds/$(CONFIGURATION)/android && repo forall -c git clean -f -x -d
