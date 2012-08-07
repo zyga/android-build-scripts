@@ -208,9 +208,14 @@ clean: | builds/$(CONFIGURATION)/android builds/$(CONFIGURATION)/android/.repo b
 
 # ---
 # Rule to spawn a development shell
+#
+# This rule is special as it uses '/bin/bash -i' (-i stands for interactive) as
+# the SHELL that executes the commands below. This allows us to read PS1 and
+# extend it the way we want.
 # ---
 .PHONY: shell
+shell: SHELL=/bin/bash -i
 shell: builds/$(CONFIGURATION)/android
 	@echo "Spawning shell for interactive android development (run 'help' to see what's available)"
 	@echo "NOTE: exit this shell to return back to your shell"
-	@( cd builds/$(CONFIGURATION)/android && $(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $(value PS1)" BASH_ENV=build/envsetup.sh bash --norc )
+	( cd builds/$(CONFIGURATION)/android && $(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $$PS1" BASH_ENV=build/envsetup.sh bash --norc )
