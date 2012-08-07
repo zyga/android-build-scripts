@@ -205,3 +205,12 @@ clean: | builds/$(CONFIGURATION)/android builds/$(CONFIGURATION)/android/.repo b
 		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
 		$@
 	cd builds/$(CONFIGURATION)/android && repo forall -c git clean -f -x -d
+
+# ---
+# Rule to spawn a development shell
+# ---
+.PHONY: shell
+shell: builds/$(CONFIGURATION)/android
+	@echo "Spawning shell for interactive android development (run 'help' to see what's available)"
+	@echo "NOTE: exit this shell to return back to your shell"
+	@( cd builds/$(CONFIGURATION)/android && $(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $(value PS1)" BASH_ENV=build/envsetup.sh bash --norc )
