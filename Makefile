@@ -209,13 +209,30 @@ clean: | builds/$(CONFIGURATION)/android builds/$(CONFIGURATION)/android/.repo b
 # ---
 # Rule to spawn a development shell
 #
-# This rule is special as it uses '/bin/bash -i' (-i stands for interactive) as
-# the SHELL that executes the commands below. This allows us to read PS1 and
-# extend it the way we want.
+# Well, that's the price of customization. The mess below does the following things:
+# 1) Informs the user about what is going on
+# 2) In a sub shell, changes directory to the root directory of the android
+#    source for the selected configuration
+# 3) Using make constructs we pass all the variables specified in $(pass-to-make)
+#    as environment for that specific command (/bin/bash)
+# 4) We spawn /bin/bash with --rcfile to pass in initial configuration
+# 5) Using process substitution we generate an argument to --rcfile. The
+#    generated configuration loads standard bash initialization files then sets
+#    PS1 to something different for easier visual differentiation. Finally it
+#    loads envsetup.sh from the Android build system.
+# In the end we get a shell prompt that looks just like what the user is
+# used to, with all the android helpers added. Yummy!
 # ---
 .PHONY: shell
-shell: SHELL=/bin/bash -i
+shell: SHELL=/bin/bash
 shell: builds/$(CONFIGURATION)/android
-	@echo "Spawning shell for interactive android development (run 'help' to see what's available)"
-	@echo "NOTE: exit this shell to return back to your shell"
-	( cd builds/$(CONFIGURATION)/android && $(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $$PS1" BASH_ENV=build/envsetup.sh bash --norc )
+	@echo "Spawning additional shell for interactive android development"
+	@echo "Please run 'help' to see what additional commands are avaiable."
+	( cd builds/$(CONFIGURATION)/android && \
+		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
+		$(SHELL) --rcfile <( \
+			echo 'test -f /etc/bashrc && . /etc/bashrc;'; \
+			echo 'test -f ~/.bashrc && . ~/.bashrc;'; \
+			echo 'PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $$PS1";'; \
+			echo '. $(shell pwd)/builds/$(CONFIGURATION)/android/build/envsetup.sh;'; \
+		) -i )
