@@ -228,7 +228,7 @@ shell: SHELL=/bin/bash
 shell: builds/$(CONFIGURATION)/android
 	@echo "Spawning additional shell for interactive android development"
 	@echo "Please run 'help' to see what additional commands are avaiable."
-	( cd builds/$(CONFIGURATION)/android && \
+	@( cd builds/$(CONFIGURATION)/android && \
 		$(foreach var,$(pass-to-make),$(if $(value $(var)),$(var)=$(value $(var)),)) \
 		$(SHELL) --rcfile <( \
 			echo 'test -f /etc/bashrc && . /etc/bashrc;'; \
