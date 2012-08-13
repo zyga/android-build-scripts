@@ -219,7 +219,8 @@ clean: | builds/$(CONFIGURATION)/android builds/$(CONFIGURATION)/android/.repo b
 # 5) Using process substitution we generate an argument to --rcfile. The
 #    generated configuration loads standard bash initialization files then sets
 #    PS1 to something different for easier visual differentiation. Finally it
-#    loads envsetup.sh from the Android build system.
+#    loads envsetup.sh from the Android build system. We also set
+#    ANDROID_PRODUCT_OUT so that adb sync works out of the box.
 # In the end we get a shell prompt that looks just like what the user is
 # used to, with all the android helpers added. Yummy!
 # ---
@@ -233,6 +234,7 @@ shell: builds/$(CONFIGURATION)/android
 		$(SHELL) --rcfile <( \
 			echo 'test -f /etc/bashrc && . /etc/bashrc;'; \
 			echo 'test -f ~/.bashrc && . ~/.bashrc;'; \
+			echo 'export ANDROID_PRODUCT_OUT=$(shell pwd)/$(OUT_DIR)'; \
 			echo 'PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $$PS1";'; \
 			echo '. $(shell pwd)/builds/$(CONFIGURATION)/android/build/envsetup.sh;'; \
 		) -i )
