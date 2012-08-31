@@ -5,6 +5,22 @@
 # NOTE: since this is a recursive build system it suffers the pitfalls of that design.
 # The trade-off is precision over convenience and speed.
 
+ifndef CONFIGURATION
+
+# ---
+# Rule to print a list of available configurations
+# ---
+
+.PHONY: configure
+configurations:=$(patsubst configs/%.mk,%,$(wildcard configs/*.mk))
+configure:
+	@echo "You have not set CONFIGURATION to any value"
+	@echo "Please select one of the following values:"
+	@echo "Available configurations:"
+	@$(foreach conf,$(configurations),echo " * $(conf)";)
+
+else
+
 # Ensure we have a configuration variable
 CONFIGURATION ?= $(error You need to specify CONFIGURATION with the name of the config you want to build)
 
@@ -238,3 +254,5 @@ shell: builds/$(CONFIGURATION)/android
 			echo 'PS1="[\[\033[2;1m\]$(CONFIGURATION)\[\033[0m\]] $$PS1";'; \
 			echo '. $(shell pwd)/builds/$(CONFIGURATION)/android/build/envsetup.sh;'; \
 		) -i )
+
+endif # configure
